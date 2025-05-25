@@ -4,6 +4,8 @@ import { nanoid } from 'nanoid';
 import * as Yup from 'yup';
 import { isValidPhoneNumber } from 'libphonenumber-js';
 import css from './ContactForm.module.css';
+import { useDispatch } from 'react-redux';
+import { addContact } from '../../redux/contactsSlice';
 // import 'yup-phone-lite';
 
 const initialValues = {
@@ -23,16 +25,19 @@ const contactsFormSchema = Yup.object().shape({
     .required('A phone number is required'),
 });
 
-export default function ContactForm({ onContact }) {
+export default function ContactForm() {
   const nameFieldId = useId();
   const numberFieldId = useId();
+  const dispatch = useDispatch();
 
   const handleSubmit = (values, actions) => {
-    onContact({
-      id: nanoid(),
-      name: values.name,
-      number: values.number,
-    });
+    dispatch(
+      addContact({
+        id: nanoid(),
+        name: values.name,
+        number: values.number,
+      }),
+    );
     actions.resetForm();
   };
 
