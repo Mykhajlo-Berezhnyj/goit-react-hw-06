@@ -9,6 +9,7 @@ const slice = createSlice({
       { id: 'id-3', name: 'Eden Clements', number: '645 - 17 - 79' },
       { id: 'id-4', name: 'Annie Copeland', number: '227 - 91 - 26' },
     ],
+    editingContactId: null,
   },
   reducers: {
     addContact(state, action) {
@@ -25,8 +26,20 @@ const slice = createSlice({
         contact.number = number;
       }
     },
+    startEditing(state, action) {
+      state.editingContactId = action.payload;
+    },
+    stopEditing(state) {
+      state.editingContactId = null;
+    },
   },
 });
 
-export const { addContact, deleteContact, updateContact } = slice.actions;
+export const {
+  addContact,
+  deleteContact,
+  updateContact,
+  startEditing,
+  stopEditing,
+} = slice.actions;
 export default slice.reducer;

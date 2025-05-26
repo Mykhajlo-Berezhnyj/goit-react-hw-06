@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 
 export default function ContactList() {
   const filter = useSelector(state => state.filters);
-  const contacts = useSelector(state => state.contacts.items);
+  const contacts = useSelector(state => state.contacts.items || []);
 
   const normalize = str => str.replace(/[-*/.,!?;:()]/g, '');
   const isNumeric = Number.isFinite(Number(normalize(filter)));

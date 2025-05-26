@@ -72,7 +72,7 @@ export default function ContactForm() {
       });
     } else {
       toast.error(
-        `Contact with this number already exists: ${existingContact.name}`,
+        `Contact with this number and ${existingContact.name} already exists: `,
       );
     }
     return;

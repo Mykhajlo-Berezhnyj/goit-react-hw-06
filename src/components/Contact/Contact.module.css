@@ -48,3 +48,9 @@
   background-color: #e05656;
   scale: 1.1;
 }
+
+.editContact {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
