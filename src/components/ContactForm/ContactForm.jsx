@@ -9,6 +9,7 @@ import { addContact, updateContact } from '../../redux/contactsSlice';
 import { useSelector } from 'react-redux';
 import { confirmAlert } from 'react-confirm-alert';
 import { toast } from 'react-hot-toast';
+import { findDuplicateByNumber } from '../findDuplicateByNumber';
 // import 'yup-phone-lite';
 
 const initialValues = {
@@ -35,12 +36,9 @@ export default function ContactForm() {
   const dispatch = useDispatch();
 
   const handleSubmit = (values, actions) => {
-    const normalize = str => str.replace(/[-*/.,!?;:()]/g, '');
-    const normalizedInputNumber = normalize(values.number);
-    const existingContact = contacts.find(
-      contact => normalize(contact.number) === normalizedInputNumber,
-    );
-    if (!existingContact) {
+    const existinContact = findDuplicateByNumber(contacts, values.number, null);
+
+    if (!existinContact) {
       dispatch(
         addContact({
           id: nanoid(),
@@ -49,17 +47,17 @@ export default function ContactForm() {
         }),
       );
       actions.resetForm();
-    } else if (existingContact.name !== values.name) {
+    } else if (existinContact.name !== values.name) {
       confirmAlert({
         title: 'Confirm Update contact',
-        message: `Contact with this number already exists under name: "${existingContact.name}". Do you want to update the name?`,
+        message: `Contact with this number already exists under name: "${existinContact.name}". Do you want to update the name?`,
         buttons: [
           {
             label: 'Yes',
             onClick: () =>
               dispatch(
                 updateContact({
-                  id: existingContact.id,
+                  id: existinContact.id,
                   name: values.name,
                   number: values.number,
                 }),
@@ -72,7 +70,7 @@ export default function ContactForm() {
       });
     } else {
       toast.error(
-        `Contact with this number and ${existingContact.name} already exists: `,
+        `Contact with this number and ${existinContact.name} already exists: `,
       );
     }
     return;

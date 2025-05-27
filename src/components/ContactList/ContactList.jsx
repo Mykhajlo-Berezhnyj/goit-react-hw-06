@@ -6,7 +6,7 @@ export default function ContactList() {
   const filter = useSelector(state => state.filters);
   const contacts = useSelector(state => state.contacts.items || []);
 
-  const normalize = str => str.replace(/[-*/.,!?;:()]/g, '');
+  const normalize = str => str.replace(/[-*/.,!?;:()\s]/g, '');
   const isNumeric = Number.isFinite(Number(normalize(filter)));
 
   const filteredContacts = contacts.filter(

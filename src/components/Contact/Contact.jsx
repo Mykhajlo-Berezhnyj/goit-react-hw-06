@@ -10,7 +10,9 @@ import {
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { useEffect, useState, useRef } from 'react';
-import { isValidPhoneNumber } from 'libphonenumber-js';
+import { validationContact } from '../utils/validationContact';
+import { FaCheck } from 'react-icons/fa';
+import { findDuplicateByNumber } from '../findDuplicateByNumber';
 
 export default function Contact({ contact }) {
   const dispatch = useDispatch();
@@ -21,33 +23,27 @@ export default function Contact({ contact }) {
   const [editNumber, setEditNumber] = useState(contact.number);
   const [focusedField, setFocusedField] = useState(null);
   const [error, setError] = useState({ name: '', number: '' });
+  const allContacts = useSelector(state => state.contacts.items);
   const nameRef = useRef();
   const numberRef = useRef();
 
-  const validationContact = ({ name, number }) => {
-    const newErrors = {};
-    if (!name.trim()) {
-      newErrors.name = 'Name is too required';
-      nameRef.current.focus();
-      return newErrors;
-    }
-    if (name.trim().length < 3) {
-      newErrors.name = 'Name is too shoot';
-      nameRef.current.focus();
-      return newErrors;
-    }
-    if (name.trim().length > 50) {
-      newErrors.name = 'Name is long';
-      nameRef.current.focus();
-      return newErrors;
-    }
-    if (!isValidPhoneNumber(number)) {
-      newErrors.number = 'Invalid phone number';
-      numberRef.current.focus();
-      return newErrors;
-    }
+  const handleNameChange = evt => {
+    const newValue = evt.target.value;
+    if (newValue === editName) return;
+    setEditName(newValue);
+    const errors = validationContact({ name: newValue, number: editNumber });
+    setError(errors);
+  };
 
-    setFocusedField(null);
+  const handleNumberChange = evt => {
+    const newValue = evt.target.value;
+    if (newValue === editNumber) return;
+    setEditNumber(newValue);
+    const errors = validationContact({
+      name: editName,
+      number: newValue,
+    });
+    setError(errors);
   };
 
   const canSwitchField = () => {
@@ -58,41 +54,17 @@ export default function Contact({ contact }) {
     setError(errors);
 
     if (focusedField === 'name' && errors.name) {
-      setTimeout(() => nameRef.current?.focus(), 0);
+      nameRef.current?.focus();
       return false;
     }
 
     if (focusedField === 'number' && errors.number) {
-      setTimeout(() => numberRef.current?.focus(), 0);
+      numberRef.current?.focus();
       return false;
     }
 
     return true;
   };
-
-  const handleBlurValidation = field => {
-    const errors = validationContact({
-      name: editName,
-      number: editNumber,
-    });
-    setError(errors);
-  };
-
-  // const handleBlurValidation = field => {
-  //   const validationErrors = validationContact({
-  //     name: editName,
-  //     number: editNumber,
-  //   });
-  //   setError(validationErrors);
-  //   if (field === 'name' && validationErrors.name) {
-  //     nameRef.current.focus();
-  //     return;
-  //   }
-  //   if (field === 'number' && validationErrors.number) {
-  //     numberRef.current.focus();
-  //     return;
-  //   }
-  // };
 
   const handleDelete = () => {
     confirmAlert({
@@ -110,40 +82,19 @@ export default function Contact({ contact }) {
     });
   };
 
-  const confirmSave = () => {
-    confirmAlert({
-      title: 'Confirm Change',
-      message: 'You confirm change this contact?',
-      buttons: [
-        {
-          label: 'Yes',
-          onClick: () => {
-            handleSave();
-          },
-        },
-        {
-          label: 'No',
-          onClick: () => {
-            handleCancel();
-          },
-        },
-      ],
-    });
-  };
-
   const handleEditing = (evt, field) => {
-    if (focusedField && !canSwitchField()) {
-      return;
-    }
-    setFocusedField(field);
-    dispatch(startEditing(contact.id));
-    setTimeout(() => {
-      if (field === 'name' && nameRef.current) {
-        nameRef.current.focus();
-      } else if (field === 'number' && numberRef.current) {
-        numberRef.current.focus();
+    if (editingContactId === contact.id) {
+      if (focusedField && !canSwitchField()) {
+        return;
       }
-    }, 0);
+    } else {
+      setError({ name: '', number: '' });
+      setEditName(contact.name);
+      setEditNumber(contact.number);
+    }
+
+    dispatch(startEditing(contact.id));
+    setFocusedField(field);
   };
 
   useEffect(() => {
@@ -152,6 +103,14 @@ export default function Contact({ contact }) {
       setError({ name: '', number: '' });
     }
   }, [editingContactId, contact.id]);
+
+  useEffect(() => {
+    if (focusedField === 'name' && nameRef.current) {
+      nameRef.current.focus();
+    } else if (focusedField === 'number' && numberRef.current) {
+      numberRef.current.focus();
+    }
+  }, [focusedField]);
 
   const handleSave = () => {
     const validationErrors = validationContact({
@@ -164,6 +123,45 @@ export default function Contact({ contact }) {
       (validationErrors.name || validationErrors.number)
     ) {
       setError(validationErrors);
+      return;
+    }
+
+    const duplicate = findDuplicateByNumber(
+      allContacts,
+      editNumber,
+      contact.id,
+    );
+    if (duplicate) {
+      confirmAlert({
+        title: 'Confirm Update contact',
+        message: `Contact with this number: "${duplicate.number}" already exists under name: "${duplicate.name}". Do you want to update the contact?`,
+        buttons: [
+          {
+            label: 'Keep current, delete old',
+            onClick: () => {
+              dispatch(deleteContact(duplicate.id));
+              dispatch(
+                updateContact({
+                  id: contact.id,
+                  name: editName.trim(),
+                  number: editNumber.trim(),
+                }),
+              );
+              dispatch(stopEditing());
+            },
+          },
+          {
+            label: 'Keep old, delete current',
+            onClick: () => {
+              dispatch(deleteContact(contact.id));
+              dispatch(stopEditing());
+            },
+          },
+          {
+            label: 'Cancel, return editing',
+          },
+        ],
+      });
       return;
     }
 
@@ -207,19 +205,21 @@ export default function Contact({ contact }) {
                 name=""
                 aria-label="Edit contact name"
                 value={editName}
-                onChange={evt => setEditName(evt.target.value)}
+                onChange={handleNameChange}
                 onKeyDown={handleKey}
-                onBlur={() => handleBlurValidation('name')}
                 className={error.name ? css.inputError : css.input}
               />
-              {error.name && <p className={css.error}>{error.name}</p>}
+              {error.name ? (
+                <p className={css.error}>{error.name}</p>
+              ) : (
+                <FaCheck className={css.validIcon} />
+              )}
             </div>
           ) : (
             <p
               className={css['contact-data']}
               onDoubleClick={evt => handleEditing(evt, 'name')}
             >
-              {/* {contact.name}{' '} */}
               {editingContactId === contact.id ? editName : contact.name}
             </p>
           )}{' '}
@@ -235,12 +235,15 @@ export default function Contact({ contact }) {
                 name="contact-number"
                 aria-label="Edit contact namber"
                 value={editNumber}
-                onChange={evt => setEditNumber(evt.target.value)}
+                onChange={handleNumberChange}
                 onKeyDown={handleKey}
-                onBlur={() => handleBlurValidation('number')}
                 className={error.number ? css.inputError : css.input}
               />
-              {error.number && <p className={css.error}>{error.number}</p>}
+              {error.number ? (
+                <p className={css.error}>{error.number}</p>
+              ) : (
+                <FaCheck className={css.validIcon} />
+              )}
             </div>
           ) : (
             <p
