@@ -1,4 +1,4 @@
-import { FaUser, FaPhone } from 'react-icons/fa';
+import { FaUser, FaPhone, FaEdit } from 'react-icons/fa';
 import css from './Contact.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -10,6 +10,7 @@ import {
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
 import { useEffect, useState, useRef } from 'react';
+import { isValidPhoneNumber } from 'libphonenumber-js';
 
 export default function Contact({ contact }) {
   const dispatch = useDispatch();
@@ -19,8 +20,79 @@ export default function Contact({ contact }) {
   const [editName, setEditName] = useState(contact.name);
   const [editNumber, setEditNumber] = useState(contact.number);
   const [focusedField, setFocusedField] = useState(null);
+  const [error, setError] = useState({ name: '', number: '' });
   const nameRef = useRef();
   const numberRef = useRef();
+
+  const validationContact = ({ name, number }) => {
+    const newErrors = {};
+    if (!name.trim()) {
+      newErrors.name = 'Name is too required';
+      nameRef.current.focus();
+      return newErrors;
+    }
+    if (name.trim().length < 3) {
+      newErrors.name = 'Name is too shoot';
+      nameRef.current.focus();
+      return newErrors;
+    }
+    if (name.trim().length > 50) {
+      newErrors.name = 'Name is long';
+      nameRef.current.focus();
+      return newErrors;
+    }
+    if (!isValidPhoneNumber(number)) {
+      newErrors.number = 'Invalid phone number';
+      numberRef.current.focus();
+      return newErrors;
+    }
+
+    setFocusedField(null);
+  };
+
+  const canSwitchField = () => {
+    const errors = validationContact({
+      name: editName,
+      number: editNumber,
+    });
+    setError(errors);
+
+    if (focusedField === 'name' && errors.name) {
+      setTimeout(() => nameRef.current?.focus(), 0);
+      return false;
+    }
+
+    if (focusedField === 'number' && errors.number) {
+      setTimeout(() => numberRef.current?.focus(), 0);
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleBlurValidation = field => {
+    const errors = validationContact({
+      name: editName,
+      number: editNumber,
+    });
+    setError(errors);
+  };
+
+  // const handleBlurValidation = field => {
+  //   const validationErrors = validationContact({
+  //     name: editName,
+  //     number: editNumber,
+  //   });
+  //   setError(validationErrors);
+  //   if (field === 'name' && validationErrors.name) {
+  //     nameRef.current.focus();
+  //     return;
+  //   }
+  //   if (field === 'number' && validationErrors.number) {
+  //     numberRef.current.focus();
+  //     return;
+  //   }
+  // };
 
   const handleDelete = () => {
     confirmAlert({
@@ -60,6 +132,9 @@ export default function Contact({ contact }) {
   };
 
   const handleEditing = (evt, field) => {
+    if (focusedField && !canSwitchField()) {
+      return;
+    }
     setFocusedField(field);
     dispatch(startEditing(contact.id));
     setTimeout(() => {
@@ -71,7 +146,27 @@ export default function Contact({ contact }) {
     }, 0);
   };
 
+  useEffect(() => {
+    if (editingContactId !== contact.id) {
+      setFocusedField(null);
+      setError({ name: '', number: '' });
+    }
+  }, [editingContactId, contact.id]);
+
   const handleSave = () => {
+    const validationErrors = validationContact({
+      name: editName,
+      number: editNumber,
+    });
+
+    if (
+      validationErrors &&
+      (validationErrors.name || validationErrors.number)
+    ) {
+      setError(validationErrors);
+      return;
+    }
+
     dispatch(
       updateContact({
         id: contact.id,
@@ -85,6 +180,8 @@ export default function Contact({ contact }) {
   const handleCancel = () => {
     setEditName(contact.name);
     setEditNumber(contact.number);
+    setError({ name: '', number: '' });
+    setFocusedField(null);
     dispatch(stopEditing());
   };
 
@@ -112,10 +209,10 @@ export default function Contact({ contact }) {
                 value={editName}
                 onChange={evt => setEditName(evt.target.value)}
                 onKeyDown={handleKey}
+                onBlur={() => handleBlurValidation('name')}
+                className={error.name ? css.inputError : css.input}
               />
-              <button type="button" onClick={handleSave}>
-                Save
-              </button>
+              {error.name && <p className={css.error}>{error.name}</p>}
             </div>
           ) : (
             <p
@@ -125,7 +222,8 @@ export default function Contact({ contact }) {
               {/* {contact.name}{' '} */}
               {editingContactId === contact.id ? editName : contact.name}
             </p>
-          )}
+          )}{' '}
+          <FaEdit className={css.editIcon} />
         </div>
         <div className={css['contact-item']}>
           <FaPhone className={css.icon} />
@@ -139,10 +237,10 @@ export default function Contact({ contact }) {
                 value={editNumber}
                 onChange={evt => setEditNumber(evt.target.value)}
                 onKeyDown={handleKey}
+                onBlur={() => handleBlurValidation('number')}
+                className={error.number ? css.inputError : css.input}
               />
-              <button type="button" onClick={handleSave}>
-                Save
-              </button>
+              {error.number && <p className={css.error}>{error.number}</p>}
             </div>
           ) : (
             <p
@@ -152,16 +250,28 @@ export default function Contact({ contact }) {
               {editingContactId === contact.id ? editNumber : contact.number}
             </p>
           )}
+          <FaEdit className={css.editIcon} />
         </div>
       </div>
       {editingContactId === contact.id ? (
-        <button
-          type="button"
-          className={css['btn-cancel']}
-          onClick={handleCancel}
-        >
-          Cancel
-        </button>
+        <div className={css.btnEdit}>
+          <button
+            type="button"
+            className={css.btnSaveEdit}
+            onClick={handleSave}
+            disabled={!!error.name || !!error.number}
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            className={css['btn-cancel']}
+            aria-label="cancel edit contact"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
+        </div>
       ) : (
         <button
           type="button"
