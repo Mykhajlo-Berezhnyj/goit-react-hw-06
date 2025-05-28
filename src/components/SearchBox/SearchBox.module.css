@@ -19,10 +19,23 @@
   border: 1px solid;
   font-size: 1em;
   width: 100%;
+  background-color: rgba(245, 245, 220, 0.89);
 }
 
 @media (min-width: 768px) {
   .search-input {
     max-width: 20em;
   }
+}
+
+.search-wrap {
+  display: flex;
+  gap: 10px;
+}
+
+.search-select {
+  width: 6em;
+  border-radius: 0.5em;
+  text-align: center;
+  background-color: rgba(245, 245, 220, 0.897);
 }

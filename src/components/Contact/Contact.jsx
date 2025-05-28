@@ -233,7 +233,7 @@ export default function Contact({ contact }) {
                 ref={numberRef}
                 type="text"
                 name="contact-number"
-                aria-label="Edit contact namber"
+                aria-label="Edit contact number"
                 value={editNumber}
                 onChange={handleNumberChange}
                 onKeyDown={handleKey}
@@ -260,6 +260,7 @@ export default function Contact({ contact }) {
         <div className={css.btnEdit}>
           <button
             type="button"
+            aria-label="save contact"
             className={css.btnSaveEdit}
             onClick={handleSave}
             disabled={!!error.name || !!error.number}
