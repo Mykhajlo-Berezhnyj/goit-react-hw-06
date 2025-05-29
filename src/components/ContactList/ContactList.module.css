@@ -29,3 +29,7 @@
     width: calc(100% / 3 - 2.4em);
   }
 }
+
+.infoQuery {
+  margin-bottom: 1.5em;
+}

@@ -1,6 +1,51 @@
-.form {
+.containerForm {
   display: flex;
-  width: 80%;
+  position: relative;
+  align-items: center;
+  text-align: center;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.651);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.allContact {
+  display: inline-block;
+  margin: 30px;
+  margin-left: 0;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+
+.form {
+  width: 6em;
+  border-radius: 0.6em;
+  border: 2px solid orange;
+  width: 6.8em;
+  max-height: 2.8em;
+  overflow: hidden;
+
+  &:hover {
+    background-color: lightgreen;
+  }
+}
+
+.formModal {
+  display: flex;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20em;
   background-color: beige;
   flex-direction: column;
   justify-content: center;
@@ -8,6 +53,7 @@
   border: 2px solid black;
   border-radius: 1em;
   padding: 1.5em;
+  pointer-events: auto;
 }
 
 @media (min-width: 768px) {
@@ -18,10 +64,9 @@
 
 .wrap {
   display: flex;
-  flex-direction: column;
   width: 100%;
-
   position: relative;
+  flex-direction: column;
 }
 
 .label {
@@ -40,14 +85,18 @@
 }
 
 .btn {
-  display: block;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
   color: black;
   border: none;
-  padding: 0.6em 1em;
+  padding: 0.4em 1em;
   border: 1px solid black;
   border-radius: 0.5em;
   font-size: 1em;
-  max-width: 8em;
+  line-height: 1em;
+  width: 6em;
   cursor: pointer;
   scale: 1;
   transition: background-color 0.3s ease, scale 0.3s ease;
@@ -59,6 +108,26 @@
   scale: 1.1;
 }
 
+.addWrap {
+  display: flex;
+  padding-top: 8px;
+  margin-bottom: 20px;
+  margin-right: 40px;
+  align-items: center;
+}
+
+.addNew {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.addIcons {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1.8em;
+  margin: 0 0.4em;
+}
+
 .error {
   position: absolute;
   text-align: center;
@@ -66,4 +135,25 @@
   left: 0;
   font-size: 0.85em;
   color: red;
+  padding-left: 0.2em;
+}
+
+.clearIcon {
+  position: absolute;
+  right: 0.4em;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: red;
+  stroke: red;
+  opacity: 0.5;
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.btnClose {
+  display: flex;
+  width: 16px;
 }

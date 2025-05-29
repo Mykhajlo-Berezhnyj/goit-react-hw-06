@@ -101,16 +101,18 @@ export default function Contact({ contact }) {
     if (editingContactId !== contact.id) {
       setFocusedField(null);
       setError({ name: '', number: '' });
+    } else if (focusedField) {
+      (focusedField === 'name' ? nameRef : numberRef)?.current?.focus();
     }
-  }, [editingContactId, contact.id]);
+  }, [editingContactId, contact.id, focusedField]);
 
-  useEffect(() => {
-    if (focusedField === 'name' && nameRef.current) {
-      nameRef.current.focus();
-    } else if (focusedField === 'number' && numberRef.current) {
-      numberRef.current.focus();
-    }
-  }, [focusedField]);
+  // useEffect(() => {
+  //   if (focusedField === 'name' && nameRef.current) {
+  //     nameRef.current.focus();
+  //   } else if (focusedField === 'number' && numberRef.current) {
+  //     numberRef.current.focus();
+  //   }
+  // }, [focusedField]);
 
   const handleSave = () => {
     const validationErrors = validationContact({

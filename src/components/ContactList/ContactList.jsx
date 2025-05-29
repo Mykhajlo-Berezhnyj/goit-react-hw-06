@@ -27,6 +27,14 @@ export default function ContactList() {
 
   return (
     <div>
+      {name ? (
+        <p className={css.infoQuery}>
+          Found {filteredContacts.length}{' '}
+          {filteredContacts.length === 1 ? 'contact' : 'contacts'}
+        </p>
+      ) : (
+        <p className={css.infoQuery}>Enter a search query to find a contact</p>
+      )}
       <ul className={css.list}>
         {filteredContacts.map(contact => (
           <li className={css.item} key={contact.id}>
