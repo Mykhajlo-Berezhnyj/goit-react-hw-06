@@ -104,9 +104,18 @@
   opacity: 0.6;
 }
 
-
 .validIcon {
   color: rgb(13, 216, 13);
   margin-left: 4px;
   font-size: 1em;
+}
+
+.alert-red:hover {
+  background-color: rgba(255, 0, 0, 0.87);
+  color: white;
+}
+
+.alert-green:hover {
+  background-color: rgba(42, 230, 35, 0.87);
+  color: black;
 }

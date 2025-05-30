@@ -73,10 +73,12 @@ export default function Contact({ contact }) {
       buttons: [
         {
           label: 'Yes',
+          className: css['alert-red'],
           onClick: () => dispatch(deleteContact(contact.id)),
         },
         {
           label: 'No',
+          className: css['alert-green'],
         },
       ],
     });

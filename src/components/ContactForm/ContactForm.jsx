@@ -36,21 +36,26 @@ export default function ContactForm() {
   const contacts = useSelector(state => state.contacts.items);
   const dispatch = useDispatch();
   const [isModal, setIsModal] = useState(false);
+  const [exitAnim, setExitAnim] = useState(false);
 
   const handleModal = (values, actions) => {
+    setIsModal(true);
     if (values.name !== '' || values.number !== '') {
       confirmAlert({
         title: 'Clear or continue editing?',
-        message: `You have incomplete contact. Do you want to clear the form or continue editing?`,
+        message:
+          'You have incomplete contact. Do you want to clear the form or continue editing?',
         buttons: [
           {
             label: 'Continue editing',
+            className: css['alert-green'],
             onClick: () => {
               setIsModal(true);
             },
           },
           {
             label: 'Clear form',
+            className: css['alert-red'],
             onClick: () => {
               actions.resetForm();
               setIsModal(true);
@@ -75,7 +80,7 @@ export default function ContactForm() {
         }),
       );
       actions.resetForm();
-      setIsModal(false);
+      handleCloseModal();
     } else if (existinContact.name !== values.name) {
       confirmAlert({
         title: 'Confirm Update contact',
@@ -83,6 +88,7 @@ export default function ContactForm() {
         buttons: [
           {
             label: 'Yes',
+            className: css['alert-green'],
             onClick: () => {
               dispatch(
                 updateContact({
@@ -91,11 +97,12 @@ export default function ContactForm() {
                   number: values.number,
                 }),
               ),
-                setIsModal(false);
+                handleCloseModal();
             },
           },
           {
-            label: 'No',
+            label: 'No ',
+            className: css['alert-red'],
           },
         ],
       });
@@ -107,14 +114,22 @@ export default function ContactForm() {
     return;
   };
 
+  const handleCloseModal = () => {
+    setExitAnim(true);
+    setTimeout(() => {
+      setIsModal(false);
+      setExitAnim(false);
+    }, 300);
+  };
+
   return (
     <div className={css.containerForm}>
       <p className={css.allContact}>
         Total number of contacts: {contacts.length}
       </p>
       <div
-        className={isModal ? css['modal-overlay'] : ''}
-        onClick={evt => evt.target === evt.currentTarget && setIsModal(false)}
+        className={isModal ? css['modal-overlay'] : css.overlay}
+        onClick={evt => evt.target === evt.currentTarget && handleCloseModal()}
       >
         <Formik
           initialValues={initialValues}
@@ -123,7 +138,11 @@ export default function ContactForm() {
         >
           {({ values, setFieldValue, ...actions }) => (
             <Form
-              className={isModal ? css.formModal : css.form}
+              className={
+                isModal
+                  ? `${css.formModal} ${exitAnim ? css['formModal-exit'] : ''}`
+                  : css.form
+              }
               onClick={
                 !isModal
                   ? e => {
@@ -136,15 +155,15 @@ export default function ContactForm() {
               <div className={css.addWrap}>
                 <FaUserPlus className={css.addIcons} />
                 <p className={css.addNew}>Add new contact</p>
-                <button
-                  type="button"
-                  className={css.btnClose}
-                  onClick={() => {
-                    setIsModal(false);
-                  }}
-                >
-                  <FaTimes className="iconClose" size={16} />
-                </button>
+                {isModal && (
+                  <button
+                    type="button"
+                    className={css.btnClose}
+                    onClick={() => handleCloseModal()}
+                  >
+                    <FaTimes className={css.iconClose} size={16} />
+                  </button>
+                )}
               </div>
               <div className={css.wrap}>
                 <label className={css.label} htmlFor={nameFieldId}>

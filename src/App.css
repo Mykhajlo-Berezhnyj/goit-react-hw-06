@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 0.4em;
+  gap: 1.2em;
   text-align: left;
 }
 
@@ -20,19 +20,31 @@
 
 .react-confirm-alert {
   position: absolute;
+  top: 0;
   display: flex;
-  width: 300px;
+  align-items: center;
+  text-align: center;
+  width: 280px;
   background-color: beige;
   padding: 1em;
   border-radius: 10px;
   box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 9999;
+
+  @media (min-width: 768px) {
+    max-width: 500px;
+  }
+}
+
+.react-confirm-alert-body {
+  text-align: center;
 }
 
 .react-confirm-alert h1 {
   font-size: 2em;
   margin-bottom: 10px;
   color: red;
+  text-align: center;
 }
 
 .react-confirm-alert-button-group {
@@ -50,13 +62,13 @@
 }
 
 .react-confirm-alert-button-group > button:nth-child(1):hover {
-  background-color: #dc3545;
-  color: white;
-  scale: 1.1;
+  scale: 1.155;
 }
 
 .react-confirm-alert-button-group > button:nth-child(2):hover {
-  background-color: gray;
-  color: white;
-  scale: 1.1;
+  scale: 1.15;
+}
+
+.react-confirm-alert-button-group > button:nth-child(3):hover {
+  scale: 1.15;
 }
