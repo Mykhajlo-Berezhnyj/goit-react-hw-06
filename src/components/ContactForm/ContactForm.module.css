@@ -33,6 +33,7 @@
   width: 6.8em;
   max-height: 2.8em;
   overflow: hidden;
+  animation: modalOut 0.3s ease-in forwards;
 
   &:hover {
     background-color: lightgreen;
@@ -54,6 +55,7 @@
   border-radius: 1em;
   padding: 1.5em;
   pointer-events: auto;
+  animation: modalIn 0.5s ease-out forwards;
 }
 
 @media (min-width: 768px) {
@@ -156,4 +158,46 @@
 .btnClose {
   display: flex;
   width: 16px;
+}
+
+@keyframes modalIn {
+  0% {
+    opacity: 0;
+    transform: translate(-10%, -10%) scale(0.2);
+  }
+  25% {
+    opacity: 0;
+    transform: translate(-20%, -20%) scale(0.4);
+  }
+  50% {
+    opacity: 0;
+    transform: translate(-30%, -30%) scale(0.6);
+  }
+  75% {
+    opacity: 0;
+    transform: translate(-40%, -40%) scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes modalOut {
+  0% {
+    opacity: 1;
+    transform: translate(50%, 50%) scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translate(25%, 25%) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+.formModal {
+  animation: modalIn 0.4s ease-out forwards;
 }

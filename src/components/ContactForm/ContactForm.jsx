@@ -30,46 +30,6 @@ const contactsFormSchema = Yup.object().shape({
     .required('A phone number is required'),
 });
 
-// function FormActions({ setIsModal }) {
-//   const { resetForm } = useFormikContext();
-
-//   const handleClearClick = () => {
-//     confirmAlert({
-//       title: 'Clear form?',
-//       message: 'Are you sure you want to clear the form?',
-//       buttons: [
-//         {
-//           label: 'Yes',
-//           onClick: () => {
-//             resetForm();
-//           },
-//         },
-//         {
-//           label: 'No',
-//         },
-//       ],
-//     });
-//   };
-
-//   return (
-//     <>
-//       <button type="button" className={css.btnClear} onClick={handleClearClick}>
-//         Clear form
-//       </button>
-
-//       <button
-//         type="button"
-//         className={css.btnClose}
-//         onClick={() => {
-//           setIsModal(false);
-//         }}
-//       >
-//         <FaTimes size={16} />
-//       </button>
-//     </>
-//   );
-// }
-
 export default function ContactForm() {
   const nameFieldId = useId();
   const numberFieldId = useId();
@@ -183,10 +143,10 @@ export default function ContactForm() {
                     setIsModal(false);
                   }}
                 >
-                  <FaTimes className="" size={16} />
+                  <FaTimes className="iconClose" size={16} />
                 </button>
               </div>
-              <div className={css.iconClose}>
+              <div className={css.wrap}>
                 <label className={css.label} htmlFor={nameFieldId}>
                   Name
                 </label>
@@ -219,6 +179,8 @@ export default function ContactForm() {
                   type="text"
                   name="number"
                   id={numberFieldId}
+                  placeholder="Enter number"
+                  arial-label="Enter number"
                 />
                 {values.number && (
                   <FaTimes

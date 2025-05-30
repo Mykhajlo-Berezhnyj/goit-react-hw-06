@@ -8,7 +8,7 @@ import { Toaster } from 'react-hot-toast';
 function App() {
   return (
     <div className="container">
-      <Toaster />
+      <Toaster position="top-left" />
       <h1>Phonebook</h1>
       <ContactForm />
       <SearchBox />
